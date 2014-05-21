@@ -45,7 +45,7 @@ module Fedex
           add_shipper(xml)
           add_recipient(xml)
           add_shipping_charges_payment(xml)
-          add_special_services(xml) if @shipping_options[:return_reason]
+          add_special_services(xml)
           add_customs_clearance(xml) if @customs_clearance_detail
           add_custom_components(xml)
           xml.RateRequestTypes "ACCOUNT"
@@ -77,15 +77,26 @@ module Fedex
       end
 
       def add_special_services(xml)
-        xml.SpecialServicesRequested {
-          xml.SpecialServiceTypes "RETURN_SHIPMENT"
-          xml.ReturnShipmentDetail {
-            xml.ReturnType "PRINT_RETURN_LABEL"
-            xml.Rma {
-              xml.Reason "#{@shipping_options[:return_reason]}"
-            }
+        if @special_services_requested
+          xml.SpecialServicesRequested {
+            if @special_services_requested[:home_delivery_premium]
+              xml.SpecialServiceTypes 'HOME_DELIVERY_PREMIUM'
+              xml.HomeDeliveryPremiumDetail {
+                xml.HomeDeliveryPremiumType @special_services_requested[:home_delivery_premium][:type]
+                xml.PhoneNumber @special_services_requested[:home_delivery_premium][:phone_number]
+              }
+            end
+            if @shipping_options[:return_reason]
+              xml.SpecialServiceTypes "RETURN_SHIPMENT"
+              xml.ReturnShipmentDetail {
+                xml.ReturnType "PRINT_RETURN_LABEL"
+                xml.Rma {
+                  xml.Reason "#{@shipping_options[:return_reason]}"
+                }
+              }
+            end
           }
-        }
+        end
       end
 
       # Callback used after a failed shipment response.

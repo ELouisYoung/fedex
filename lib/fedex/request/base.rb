@@ -47,10 +47,17 @@ module Fedex
       def initialize(credentials, options={})
         requires!(options, :shipper, :recipient, :packages)
         @credentials = credentials
-        @shipper, @recipient, @packages, @service_type, @customs_clearance_detail, @debug = options[:shipper], options[:recipient], options[:packages], options[:service_type], options[:customs_clearance_detail], options[:debug]
-        @debug = ENV['DEBUG'] == 'true'
+        @shipper   = options[:shipper]
+        @recipient = options[:recipient]
+        @packages  = options[:packages]
+        @service_type = options[:service_type]
+        @special_services_requested = options[:special_services_requested]
+        @customs_clearance_detail = options[:customs_clearance_detail]
         @shipping_options =  options[:shipping_options] ||={}
         @payment_options = options[:payment_options] ||={}
+
+        @debug = options[:debug] || ENV['DEBUG'] == 'true'
+
         requires!(@payment_options, :type, :account_number, :name, :company, :phone_number, :country_code) if @payment_options.length > 0
         if options.has_key?(:mps)
           @mps = options[:mps]

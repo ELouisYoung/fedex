@@ -4,6 +4,7 @@ require 'fedex/request/rate'
 require 'fedex/request/tracking_information'
 require 'fedex/request/address'
 require 'fedex/request/document'
+require 'fedex/request/deletion'
 
 module Fedex
   class Shipment
@@ -29,6 +30,10 @@ module Fedex
     # @param [Hash] label_specification, A hash containing the label printer settings
     def label(options = {})
       Request::Label.new(@credentials, options).process_request
+    end
+
+    def delete options={}
+      Request::Deletion.new(@credentials, options).process_request
     end
 
     # @param [Hash] shipper, A hash containing the shipper information

@@ -45,6 +45,7 @@ module Fedex
       #
       # return a Fedex::Request::Base object
       def initialize(credentials, options={})
+        # TODO: ugly, refactor
         requires!(options, :shipper, :recipient, :packages)
         @credentials = credentials
         @shipper   = options[:shipper]

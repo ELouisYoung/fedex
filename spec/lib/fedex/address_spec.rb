@@ -2,13 +2,13 @@ require 'spec_helper'
 
 module Fedex
   describe Address, :production do
-    describe "validation" do
+    describe 'validation' do
 
       # Address Validation is only enabled in the production environment
       #
-      let(:fedex) { Shipment.new(fedex_production_credentials) }
+      let(:fedex) { Shipment.new(fedex_credentials) }
 
-      context "valid address", :vcr do
+      context 'with a valid address', :vcr do
         let(:address) do
           {
             :address     => "5 Elm Street",
@@ -34,7 +34,7 @@ module Fedex
         end
       end
 
-      context "multiple address validation results", :vcr do
+      context 'multiple address validation results', :vcr do
         let(:address) do
           {
             :address     => "301 Las Colinas Blvd",

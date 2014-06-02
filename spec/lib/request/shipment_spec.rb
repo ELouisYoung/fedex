@@ -30,14 +30,6 @@ describe Fedex::Request::Shipment do
       File.join(Dir.tmpdir, "label#{rand(15000)}.pdf")
     }
 
-    describe '.delete', :vcr do
-      let(:tracking_number) { '794836408166' }
-
-      it 'calls to fedex to delete a shipment' do
-        fedex.delete tracking_number: tracking_number
-      end
-    end
-
     context "domestic shipment", :vcr do
       let(:options) do
         { :shipper => shipper, :recipient => recipient, :packages => packages, :service_type => "FEDEX_GROUND", :filename => filename }

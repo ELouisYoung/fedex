@@ -7,7 +7,10 @@ module Fedex
 
       def initialize(credentials, options={})
         requires! options, :tracking_number
+        @credentials = credentials
         @tracking_number = options[:tracking_number]
+
+        @debug = options[:debug] || ENV['DEBUG'] == 'true'
       end
 
       # Sends post request to Fedex web service and parse the response.
@@ -24,6 +27,10 @@ module Fedex
 
       private
 
+      def service
+        { id: 'ship', version: Fedex::API_VERSION }
+      end
+
       def add_deletion_detail xml
         xml.TrackingId {
           xml.TrackingIdType 'FEDEX'
@@ -34,8 +41,8 @@ module Fedex
 
       # Callback used after a failed shipment response.
       def failure_response(api_response, response)
-        error_message = if response[:process_shipment_reply]
-          [response[:process_shipment_reply][:notifications]].flatten.first[:message]
+        error_message = if response[:shipment_reply]
+          [response[:shipment_reply][:notifications]].flatten.first[:message]
         else
           "#{api_response["Fault"]["detail"]["fault"]["reason"]}\n--#{api_response["Fault"]["detail"]["fault"]["details"]["ValidationFailureDetail"]["message"].join("\n--")}"
         end rescue $1
@@ -44,7 +51,7 @@ module Fedex
 
       # Callback used after a successful shipment response.
       def success_response(api_response, response)
-        @response_details = response[:process_shipment_reply]
+        @response_details = response[:shipment_reply]
       end
 
       # Build xml Fedex Web Service request
@@ -55,7 +62,6 @@ module Fedex
             add_client_detail xml
             add_version xml
             xml.ShipTimestamp Time.now.utc.iso8601(2)
-            add_requested_shipment xml
             add_deletion_detail xml
           }
         end
@@ -64,8 +70,8 @@ module Fedex
 
       # Successful request
       def success?(response)
-        response[:process_shipment_reply] &&
-          %w{SUCCESS WARNING NOTE}.include?(response[:process_shipment_reply][:highest_severity])
+        response[:shipment_reply] &&
+          %w{SUCCESS WARNING NOTE}.include?(response[:shipment_reply][:highest_severity])
       end
 
     end

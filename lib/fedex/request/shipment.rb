@@ -83,10 +83,10 @@ module Fedex
               xml.SpecialServiceTypes 'HOME_DELIVERY_PREMIUM'
               xml.HomeDeliveryPremiumDetail {
                 xml.HomeDeliveryPremiumType @special_services_requested[:home_delivery_premium][:type]
-                xml.PhoneNumber @special_services_requested[:home_delivery_premium][:phone_number]
                 if @special_services_requested[:home_delivery_premium][:type] == 'DATE_CERTAIN'
                   xml.Date @special_services_requested[:home_delivery_premium][:date]
                 end
+                xml.PhoneNumber @special_services_requested[:home_delivery_premium][:phone_number]
               }
             end
             if @shipping_options[:return_reason]
